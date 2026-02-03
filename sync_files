@@ -1,0 +1,22 @@
+#!/bin/bash
+
+SOURCE_DIR="$HOME/tmux"
+TARGET_DIR="$HOME"
+
+# Files to ignore when creating symlinks
+IGNORE_FILES=("sync_files" "README.md" "LICENSE" ".git")
+
+for file in "$SOURCE_DIR"/* "$SOURCE_DIR"/.[!.]*; do
+    [ -e "$file" ] || continue
+
+    filename=$(basename "$file")
+
+    # Skip ignored files
+    for ignore in "${IGNORE_FILES[@]}"; do
+        [[ "$filename" == "$ignore" ]] && continue 2
+    done
+
+    target_path="$TARGET_DIR/$filename"
+
+    ln -sf "$file" "$target_path"
+done
