@@ -23,8 +23,8 @@ if [ $? != 0 ]; then
   tmux send-keys -t $SESSION_NAME:"${WINDOWS[0]}" "cd $PROJECT_ROOT" C-m
   tmux send-keys -t $SESSION_NAME:"${WINDOWS[1]}" "cd $PROJECT_ROOT && vim -S lazysql.vimsession" C-m
   tmux send-keys -t $SESSION_NAME:"${WINDOWS[2]}" "cd $PROJECT_ROOT && claude" C-m
-  tmux send-keys -t $SESSION_NAME:"${WINDOWS[4]}" "cd $PROJECT_ROOT && lazygit" C-m
-  tmux send-keys -t $SESSION_NAME:"${WINDOWS[5]}" "cd $PROJECT_ROOT" C-m
+  tmux send-keys -t $SESSION_NAME:"${WINDOWS[3]}" "cd $PROJECT_ROOT && lazygit" C-m
+  tmux send-keys -t $SESSION_NAME:"${WINDOWS[4]}" "cd $PROJECT_ROOT" C-m
 
   tmux select-window -t $SESSION_NAME:"${WINDOWS[1]}"
 fi
