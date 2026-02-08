@@ -1,0 +1,21 @@
+#!/bin/bash
+
+SESSION_NAME="arch_linux_env"
+
+tmux has-session -t $SESSION_NAME 2>/dev/null
+
+if [ $? != 0 ]; then
+  tmux new-session -d -s $SESSION_NAME -n arch_os
+  tmux send-keys -t $SESSION_NAME:arch_os "cd $HOME/Workspace/malang && distrobox enter malangbox" C-m
+  tmux new-window -t $SESSION_NAME -n malang
+  tmux send-keys -t $SESSION_NAME:malang "cd $HOME/Workspace/malang && vim -S my.vimsession" C-m
+  tmux new-window -t $SESSION_NAME -n claude 
+  tmux send-keys -t $SESSION_NAME:claude "cd $HOME/Workspace/malang && claude" C-m
+  tmux new-window -t $SESSION_NAME -n ubuntu_shell
+  tmux send-keys -t $SESSION_NAME:ubuntu_shell " cd $HOME/Workspace/malang" C-m
+  tmux new-window -t $SESSION_NAME -n lazygit
+  tmux send-keys -t $SESSION_NAME:lazygit "cd $HOME/Workspace/malang && lazygit" C-m
+  tmux select-window -t $SESSION_NAME:malang
+fi
+
+tmux attach-session -t $SESSION_NAME
