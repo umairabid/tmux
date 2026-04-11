@@ -1,34 +1,77 @@
-#!/bin/bash
+#!/bin/bash 
 
 PROJECT_ROOT="$HOME/dev/sweaty_wallet"
 SESSION_NAME="sweaty_wallet"
-WINDOWS=(
-  docker
-  main_app
-  claude
-  extension
-  lazygit
-  terminal
-)
+
+GetWorkerContainerId() {
+  local container_name="sweaty_wallet-worker"
+  local row=""
+  local tries=0
+  local max_tries=6
+  local container_id=""
+
+  while [[ -z "$row" && tries -lt max_tries ]]; do
+    row=$(docker ps | grep -P "$container_name-\d")
+    IFS=' ' read -ra parts <<< "$row"
+
+    if [[ -z "$row" ]]; then
+      sleep 10
+      tries=$((tries+1))
+    else
+      container_id="${parts[0]}"
+      break
+    fi
+  done
+
+  echo "$container_id"
+}
 
 tmux has-session -t $SESSION_NAME 2>/dev/null
 
 if [ $? != 0 ]; then
-  for window in "${WINDOWS[@]}"; do
-    if [ "$window" == "docker" ]; then
-      tmux new-session -d -s $SESSION_NAME -n $window
-    else
-      tmux new-window -t $SESSION_NAME -n $window
-    fi
+  declare -A windows
+  windows[docker]="cd $PROJECT_ROOT && docker compose up --build"
+  windows[lazygit]="cd $PROJECT_ROOT && lazygit"
+  windows[main_app]="cd $PROJECT_ROOT/main_app && vim"
+  windows[claude]="cd $PROJECT_ROOT && claude"
+  windows[console]="cd $PROJECT_ROOT"
+  windows[extension]="cd $PROJECT_ROOT/chrome_extension && vim"
+  windows[terminal]="cd $PROJECT_ROOT"
+
+  TABS=(
+    lazygit
+    main_app
+    claude
+    console
+    extension
+    terminal
+  )
+
+  echo "Starting docker..."
+  tmux new-session -d -s $SESSION_NAME -n "docker"
+  tmux send-keys -t $SESSION_NAME:"docker" "${windows[docker]}" C-m
+
+  for tab in "${TABS[@]}"; do
+    tmux new-window -t $SESSION_NAME -n "$tab"
   done
-  tmux send-keys -t $SESSION_NAME:"${WINDOWS[0]}" "cd $PROJECT_ROOT && docker compose up --build" C-m
-  tmux send-keys -t $SESSION_NAME:"${WINDOWS[1]}" "cd $PROJECT_ROOT/main_app && vim" C-m
-  tmux send-keys -t $SESSION_NAME:"${WINDOWS[2]}" "cd $PROJECT_ROOT && claude" C-m
-  tmux send-keys -t $SESSION_NAME:"${WINDOWS[3]}" "cd $PROJECT_ROOT/chrome_extension && vim" C-m
-  tmux send-keys -t $SESSION_NAME:"${WINDOWS[4]}" "cd $PROJECT_ROOT && lazygit" C-m
-  tmux send-keys -t $SESSION_NAME:"${WINDOWS[5]}" "cd $PROJECT_ROOT" C-m
-  
-  tmux select-window -t $SESSION_NAME:"${WINDOWS[1]}"
+
+  for key in "${!windows[@]}"; do
+    command=${windows[$key]}
+    if [ "$key" == "docker" ]; then
+      continue
+    fi
+    if [ "$key" == "console" ]; then
+      container_id=$(GetWorkerContainerId)
+      if [[ -n "$container_id" ]]; then
+        command="cd $PROJECT_ROOT && docker exec -it $container_id bash"
+      fi
+    fi
+    tmux send-keys -t $SESSION_NAME:"$key" "$command" C-m
+  done
+
+  tmux select-window -t $SESSION_NAME:"main_app"
 fi
 
 tmux attach-session -t $SESSION_NAME
+
+
