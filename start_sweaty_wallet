@@ -3,29 +3,6 @@
 PROJECT_ROOT="$HOME/dev/sweaty_wallet"
 SESSION_NAME="sweaty_wallet"
 
-GetWorkerContainerId() {
-  local container_name="sweaty_wallet-worker"
-  local row=""
-  local tries=0
-  local max_tries=6
-  local container_id=""
-
-  while [[ -z "$row" && tries -lt max_tries ]]; do
-    row=$(docker ps | grep -P "$container_name-\d")
-    IFS=' ' read -ra parts <<< "$row"
-
-    if [[ -z "$row" ]]; then
-      sleep 10
-      tries=$((tries+1))
-    else
-      container_id="${parts[0]}"
-      break
-    fi
-  done
-
-  echo "$container_id"
-}
-
 tmux has-session -t $SESSION_NAME 2>/dev/null
 
 if [ $? != 0 ]; then
@@ -34,7 +11,7 @@ if [ $? != 0 ]; then
   windows[lazygit]="cd $PROJECT_ROOT && lazygit"
   windows[main_app]="cd $PROJECT_ROOT/main_app && vim"
   windows[claude]="cd $PROJECT_ROOT && claude"
-  windows[console]="cd $PROJECT_ROOT"
+  windows[console]="cd $PROJECT_ROOT && ./docker_rails_console_login"
   windows[extension]="cd $PROJECT_ROOT/chrome_extension && vim"
   windows[terminal]="cd $PROJECT_ROOT"
 
@@ -56,17 +33,10 @@ if [ $? != 0 ]; then
   done
 
   for key in "${!windows[@]}"; do
-    command=${windows[$key]}
     if [ "$key" == "docker" ]; then
       continue
     fi
-    if [ "$key" == "console" ]; then
-      container_id=$(GetWorkerContainerId)
-      if [[ -n "$container_id" ]]; then
-        command="cd $PROJECT_ROOT && docker exec -it $container_id bash"
-      fi
-    fi
-    tmux send-keys -t $SESSION_NAME:"$key" "$command" C-m
+    tmux send-keys -t $SESSION_NAME:"$key" "${windows[$key]}" C-m
   done
 
   tmux select-window -t $SESSION_NAME:"main_app"
