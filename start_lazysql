@@ -7,7 +7,7 @@ tmux has-session -t $SESSION_NAME 2>/dev/null
 
 if [ $? != 0 ]; then
   declare -A windows
-  windows[processes]="cd $PROJECT_ROOT && bash"
+  windows[processes]="cd $PROJECT_ROOT"
   windows[lazygit]="cd $PROJECT_ROOT && lazygit"
   windows[code]="cd $PROJECT_ROOT && vim"
   windows[gemini]="cd $PROJECT_ROOT && gemini"
