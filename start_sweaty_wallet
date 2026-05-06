@@ -11,6 +11,7 @@ if [ $? != 0 ]; then
   windows[lazygit]="cd $PROJECT_ROOT && lazygit"
   windows[main_app]="cd $PROJECT_ROOT/main_app && vim"
   windows[claude]="cd $PROJECT_ROOT && claude"
+  windows[gemini]="cd $PROJECT_ROOT && gemini"
   windows[console]="cd $PROJECT_ROOT && ./docker_rails_console_login"
   windows[extension]="cd $PROJECT_ROOT/chrome_extension && vim"
   windows[terminal]="cd $PROJECT_ROOT"
@@ -19,6 +20,7 @@ if [ $? != 0 ]; then
     lazygit
     main_app
     claude
+    gemini
     console
     extension
     terminal
