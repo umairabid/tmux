@@ -11,12 +11,14 @@ if [ $? != 0 ]; then
   windows[lazygit]="cd $PROJECT_ROOT && lazygit"
   windows[code]="cd $PROJECT_ROOT && vim"
   windows[gemini]="cd $PROJECT_ROOT && gemini"
+  windows[claude]="cd $PROJECT_ROOT && claude"
   windows[terminal]="cd $PROJECT_ROOT && bash"
 
   TABS=(
     lazygit
     code
     gemini
+    claude
     terminal
   )
 
