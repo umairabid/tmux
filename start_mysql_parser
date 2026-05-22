@@ -1,0 +1,37 @@
+#!/bin/bash
+
+PROJECT_ROOT="$HOME/dev/ruby-mysql-parser"
+SESSION_NAME="ruby_mysql_parser"
+
+tmux has-session -t $SESSION_NAME 2>/dev/null
+
+if [ $? != 0 ]; then
+  declare -A windows
+  windows[processes]="cd $PROJECT_ROOT"
+  windows[lazygit]="cd $PROJECT_ROOT && lazygit"
+  windows[code]="cd $PROJECT_ROOT && vim"
+  windows[gemini]="cd $PROJECT_ROOT && gemini"
+  windows[claude]="cd $PROJECT_ROOT && claude"
+  windows[terminal]="cd $PROJECT_ROOT && bash"
+
+  TABS=(
+    lazygit
+    code
+    gemini
+    claude
+    terminal
+  )
+
+  tmux new-session -d -s $SESSION_NAME -n "processes"
+  for tab in "${TABS[@]}"; do
+    tmux new-window -t $SESSION_NAME -n "$tab"
+  done
+
+  for key in "${!windows[@]}"; do
+    tmux send-keys -t $SESSION_NAME:"$key" "${windows[$key]}" C-m
+  done
+
+  tmux select-window -t $SESSION_NAME:"code"
+fi
+
+tmux attach-session -t $SESSION_NAME
