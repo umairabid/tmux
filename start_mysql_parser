@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 PROJECT_ROOT="$HOME/dev/ruby-mysql-parser"
 SESSION_NAME="ruby_mysql_parser"

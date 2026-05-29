@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/usr/bin/env bash 
 
 PROJECT_ROOT="$HOME/dev/sweaty_wallet"
 SESSION_NAME="sweaty_wallet"
